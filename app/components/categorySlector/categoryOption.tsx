@@ -1,4 +1,4 @@
-import { Box, Button } from "@mui/material";
+import { Button } from "@mui/material";
 
 export interface CategoryOptionProps {
   optionName: string;
@@ -11,14 +11,12 @@ export function CategoryOption({
   isSelected,
   onClick
 }: CategoryOptionProps) {
-  const selectedSx = isSelected ? { backgroundColor: "#FFFFFF11" } : {};
+  const selectedSx = isSelected ? { backgroundColor: "#FFFFFF55" } : {};
 
-  const boxSx = {
+  return <Button sx={{
     color: "white",
     padding: "10px",
     borderRadius: "0px",
     ...selectedSx,
-  };
-
-  return <Button sx={boxSx} onClick={() => onClick(optionName)}>{optionName}</Button>;
+  }} onClick={() => onClick(optionName)}>{optionName}</Button>;
 }

@@ -7,7 +7,7 @@ export interface CategorySelectorProps {
 }
 
 export function CategorySelector({ options }: CategorySelectorProps) {
-  const [selectedOption, setSelectedOption] = useState(options[0]);
+  const [selectedOption, setSelectedOption] = useState(options.length > 0 ? options[0] : "");
 
   return (
     <Box width="100%" display="flex" justifyContent="center">
