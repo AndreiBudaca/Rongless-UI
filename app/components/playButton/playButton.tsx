@@ -34,7 +34,7 @@ export function PlayButton({
     if (!isPlaying) return play(player, playTime, setIsPlaying, setProgress);
     if (isPaused) return resume(player, setIsPaused);
     return pause(player, setIsPaused);
-  }, [isPlaying, isPaused, player]);
+  }, [isPlaying, isPaused, player, playTime]);
 
   const buttonIcon = useMemo(() => {
     if (player === null) return <HourglassBottomIcon />;

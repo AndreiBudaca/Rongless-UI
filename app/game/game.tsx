@@ -4,14 +4,37 @@ import { Title } from "~/components/title/title";
 import { CategorySelector } from "~/components/categorySlector/categorySelector";
 import { PlayButton } from "~/components/playButton/playButton";
 import { ProgressBar } from "~/components/progressBar/progressBar";
-import { GuessesList } from "~/components/guesesList/guessesList";
+import {
+  GuessesList,
+  GuessesListProps,
+} from "~/components/guesesList/guessesList";
 import { GuessBar } from "~/components/guessBar/guessBar";
+import { GuessesContainerProps } from "~/components/guesesList/guessContainer";
 
 export const MAX_PLAY_TIME = 30;
+export const MAX_PHASES = 6;
+export const PHASE_TIMES = [0.5, 1, 2, 4, 8, 15, 30];
 
 export function Game() {
   const [songProgress, setSongProgress] = useState(0);
-  const [phaseMaxProgress, setPhaseMaxProgress] = useState(5);
+  const [phase, setPhase] = useState(0);
+  const [guesses, setGuesses] = useState<GuessesListProps>({
+    guesses: [
+      { guess: null, type: "none" },
+      { guess: null, type: "none" },
+      { guess: null, type: "none" },
+      { guess: null, type: "none" },
+      { guess: null, type: "none" },
+      { guess: null, type: "none" },
+    ],
+  });
+
+  const makeGuess = (value: string) => {
+    const newGuess: GuessesContainerProps = { guess: value, type: "wrong" };
+    guesses.guesses[phase] = newGuess;
+    setGuesses({ guesses: [...guesses.guesses] });
+    setPhase(phase + 1);
+  };
 
   return (
     <Box display="flex" justifyContent="center" height="100vh">
@@ -24,24 +47,15 @@ export function Game() {
         gap="25px"
       >
         <Title />
-        <CategorySelector options={["test", "test2", "test3"]} />
-        <GuessesList
-          guesses={[
-            { guess: "Jhon Bandera - Mama mea e florareasa", type: "wrong" },
-            { guess: "Elton Jhon - La inima mi-am pus lacat", type: "wrong" },
-            { guess: "Hannah Montana - Dor de tine", type: "wrong" },
-            { guess: "Jill Dobrica - HITS", type: "correct" },
-            { guess: null, type: "none" },
-            { guess: null, type: "none" },
-          ]}
-        />
+        <CategorySelector options={["Muzica de petrece"]} />
+        <GuessesList guesses={guesses.guesses} />
         <ProgressBar
           progress={(songProgress * 100) / MAX_PLAY_TIME}
-          maxProgress={(phaseMaxProgress * 100) / MAX_PLAY_TIME}
+          maxProgress={(PHASE_TIMES[phase] * 100) / MAX_PLAY_TIME}
         />
         <PlayButton
           videoId={"dQw4w9WgXcQ"}
-          playTime={phaseMaxProgress}
+          playTime={PHASE_TIMES[phase]}
           setProgress={(progress: number) => setSongProgress(progress)}
         />
         <GuessBar
@@ -67,6 +81,7 @@ export function Game() {
             { value: "orange", label: "Orange" },
             { value: "watermelon", label: "Watermelon" },
           ]}
+          onValueSelected={makeGuess}
         />
       </Box>
     </Box>

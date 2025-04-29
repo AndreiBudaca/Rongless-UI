@@ -10,6 +10,6 @@ export interface GuessesListProps {
 
 export function GuessesList({ guesses }: GuessesListProps) {
   return <Box display="flex" flexDirection="column" gap="15px">
-    {guesses.map(g => <GuessesContainer guess={g.guess} type={g.type} key={g.guess} />)}
+    {guesses.map((g, i) => <GuessesContainer guess={g.guess} type={g.type} key={i} />)}
   </Box>
 }

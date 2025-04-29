@@ -6,15 +6,19 @@ export interface GuessBarProps {
     value: string;
     label: string;
   }[];
+  onValueSelected: (value: string) => void,
 }
 
-export function GuessBar({ possibleGuesses }: GuessBarProps) {
+export function GuessBar({ possibleGuesses, onValueSelected }: GuessBarProps) {
   return (
     <Box>
       <Select
         options={possibleGuesses}
         placeholder={"Guess the song"}
         value={null}
+        menuPlacement="top"
+        openMenuOnClick={false}
+        onChange={(newValue) => onValueSelected(newValue?.label ?? "")}
         styles={{
           control: (baseStyles, state) => ({
             ...baseStyles,
@@ -31,8 +35,12 @@ export function GuessBar({ possibleGuesses }: GuessBarProps) {
           }),
           menu: (baseStyles, state) => ({
             ...baseStyles,
-            backgroundColor: "#00000000",
+            backgroundColor: "#222222",
             color: "white"
+          }),
+          dropdownIndicator: (baseStyles, state) => ({
+            ...baseStyles,
+            display: "none"
           }),
         }}
         theme={(theme) => ({
