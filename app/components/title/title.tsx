@@ -12,8 +12,8 @@ export function Title() {
           marginBottom: "25px",
         }}
       >
-        <span style={{ color: "white" }}>Songless </span>
-        <span style={{ color: "grey" }}>by Danel</span>
+        <span style={{ color: "white" }}>Rong</span>
+        <span style={{ color: "grey" }}>less</span>
       </span>
     </Box>
   );

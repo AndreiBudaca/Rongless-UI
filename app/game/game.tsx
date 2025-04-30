@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Box } from "@mui/material";
 import { Title } from "~/components/title/title";
 import { CategorySelector } from "~/components/categorySlector/categorySelector";
@@ -8,8 +8,10 @@ import {
   GuessesList,
   GuessesListProps,
 } from "~/components/guesesList/guessesList";
-import { GuessBar } from "~/components/guessBar/guessBar";
+import { GuessBar, GuessBarOption } from "~/components/guessBar/guessBar";
 import { GuessesContainerProps } from "~/components/guesesList/guessContainer";
+import { DailyVideo, GetDailySongs, GetSongs } from "~/services/guessService";
+import { EndModal } from "~/components/modals/endModal";
 
 export const MAX_PLAY_TIME = 30;
 export const MAX_PHASES = 6;
@@ -28,12 +30,46 @@ export function Game() {
       { guess: null, type: "none" },
     ],
   });
+  const [video, setVideo] = useState<DailyVideo | null>(null);
+  const [videoList, setVideoList] = useState<GuessBarOption[]>([]);
+  const [gameState, setGameState] = useState<"play" | "win" | "lose" | "end">(
+    "play"
+  );
 
-  const makeGuess = (value: string) => {
-    const newGuess: GuessesContainerProps = { guess: value, type: "wrong" };
+  useEffect(() => {
+    const fetchData = async () => {
+      const [videos, daily] = await Promise.all([GetSongs(), GetDailySongs()]);
+
+      setVideoList(
+        videos.videos.map((v, i) => {
+          return { value: v.video_id, label: v.video_title };
+        })
+      );
+      setVideo(daily);
+    };
+
+    fetchData();
+  }, []);
+
+  const makeGuess = (value: string, label: string) => {
+    if (phase >= MAX_PHASES || gameState !== "play") return;
+
+    const isCorrectGuess = value === video?.video.video_id;
+
+    const newGuess: GuessesContainerProps = {
+      guess: label,
+      type: isCorrectGuess ? "correct" : "wrong",
+    };
     guesses.guesses[phase] = newGuess;
     setGuesses({ guesses: [...guesses.guesses] });
     setPhase(phase + 1);
+
+    if (isCorrectGuess) {
+      setGameState("win");
+    }
+    if (phase == MAX_PHASES - 1) {
+      setGameState("lose");
+    }
   };
 
   return (
@@ -47,43 +83,30 @@ export function Game() {
         gap="25px"
       >
         <Title />
-        <CategorySelector options={["Muzica de petrece"]} />
+        <CategorySelector options={["Muzica de petrecere"]} />
         <GuessesList guesses={guesses.guesses} />
         <ProgressBar
           progress={(songProgress * 100) / MAX_PLAY_TIME}
           maxProgress={(PHASE_TIMES[phase] * 100) / MAX_PLAY_TIME}
         />
         <PlayButton
-          videoId={"dQw4w9WgXcQ"}
+          videoId={video?.video.video_id ?? ""}
           playTime={PHASE_TIMES[phase]}
           setProgress={(progress: number) => setSongProgress(progress)}
         />
         <GuessBar
-          possibleGuesses={[
-            { value: "chocolate", label: "Chocolate" },
-            { value: "strawberry", label: "Strawberry" },
-            { value: "vanilla", label: "Vanilla" },
-            { value: "mint", label: "Mint" },
-            { value: "caramel", label: "Caramel" },
-            { value: "coffee", label: "Coffee" },
-            { value: "banana", label: "Banana" },
-            { value: "blueberry", label: "Blueberry" },
-            { value: "lemon", label: "Lemon" },
-            { value: "raspberry", label: "Raspberry" },
-            { value: "peach", label: "Peach" },
-            { value: "mango", label: "Mango" },
-            { value: "coconut", label: "Coconut" },
-            { value: "pineapple", label: "Pineapple" },
-            { value: "hazelnut", label: "Hazelnut" },
-            { value: "almond", label: "Almond" },
-            { value: "blackberry", label: "Blackberry" },
-            { value: "grape", label: "Grape" },
-            { value: "orange", label: "Orange" },
-            { value: "watermelon", label: "Watermelon" },
-          ]}
+          possibleGuesses={videoList}
           onValueSelected={makeGuess}
+          disabled={gameState === "end"}
         />
       </Box>
+
+      <EndModal
+        open={gameState === "win" || gameState === "lose"}
+        videoName={video?.video.video_title ?? ""}
+        onClose={() => setGameState("end")}
+        condition={gameState === "win" ? "win" : "loose"}
+      />
     </Box>
   );
 }

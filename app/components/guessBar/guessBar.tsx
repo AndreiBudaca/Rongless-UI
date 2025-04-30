@@ -2,14 +2,17 @@ import { Box } from "@mui/material";
 import Select from "react-select";
 
 export interface GuessBarProps {
-  possibleGuesses: {
-    value: string;
-    label: string;
-  }[];
-  onValueSelected: (value: string) => void,
+  possibleGuesses: GuessBarOption[];
+  onValueSelected: (value: string, label: string) => void;
+  disabled: boolean;
 }
 
-export function GuessBar({ possibleGuesses, onValueSelected }: GuessBarProps) {
+export interface GuessBarOption {
+  value: string;
+  label: string;
+}
+
+export function GuessBar({ possibleGuesses, onValueSelected, disabled }: GuessBarProps) {
   return (
     <Box>
       <Select
@@ -18,7 +21,8 @@ export function GuessBar({ possibleGuesses, onValueSelected }: GuessBarProps) {
         value={null}
         menuPlacement="top"
         openMenuOnClick={false}
-        onChange={(newValue) => onValueSelected(newValue?.label ?? "")}
+        isDisabled={disabled}
+        onChange={(newValue) => onValueSelected(newValue!.value, newValue!.label)}
         styles={{
           control: (baseStyles, state) => ({
             ...baseStyles,
@@ -36,11 +40,11 @@ export function GuessBar({ possibleGuesses, onValueSelected }: GuessBarProps) {
           menu: (baseStyles, state) => ({
             ...baseStyles,
             backgroundColor: "#222222",
-            color: "white"
+            color: "white",
           }),
           dropdownIndicator: (baseStyles, state) => ({
             ...baseStyles,
-            display: "none"
+            display: "none",
           }),
         }}
         theme={(theme) => ({
@@ -49,7 +53,7 @@ export function GuessBar({ possibleGuesses, onValueSelected }: GuessBarProps) {
           colors: {
             ...theme.colors,
             primary25: "#000000",
-            primary50: "#00000033"
+            primary50: "#00000033",
           },
         })}
       />
