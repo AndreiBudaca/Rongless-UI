@@ -17,7 +17,11 @@ export const MAX_PLAY_TIME = 30;
 export const MAX_PHASES = 6;
 export const PHASE_TIMES = [0.5, 1, 2, 4, 8, 15, 30];
 
-export function Game() {
+export interface GameProps {
+  unlimited: boolean;
+}
+
+export function Game({ unlimited }: GameProps) {
   const [songProgress, setSongProgress] = useState(0);
   const [phase, setPhase] = useState(0);
   const [guesses, setGuesses] = useState<GuessesListProps>({
@@ -36,16 +40,27 @@ export function Game() {
     "play"
   );
 
+  if (unlimited && gameState == "end") window.location.reload();
+
   useEffect(() => {
     const fetchData = async () => {
-      const [videos, daily] = await Promise.all([GetSongs(), GetDailySongs()]);
+      const videos = await GetSongs();
 
       setVideoList(
         videos.videos.map((v, i) => {
           return { value: v.video_id, label: v.video_title };
         })
       );
-      setVideo(daily);
+
+      if (!unlimited) {
+        const daily = await GetDailySongs();
+        setVideo(daily);
+      } else {
+        const randomVideoIndex = Math.round(
+          (videos.videos.length - 1) * Math.random()
+        );
+        setVideo({ date: new Date(), video: videos.videos[randomVideoIndex] });
+      }
     };
 
     fetchData();
