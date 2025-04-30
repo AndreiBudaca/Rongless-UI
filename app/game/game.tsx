@@ -81,8 +81,7 @@ export function Game({ unlimited }: GameProps) {
 
     if (isCorrectGuess) {
       setGameState("win");
-    }
-    if (phase == MAX_PHASES - 1) {
+    } else if (phase == MAX_PHASES - 1) {
       setGameState("lose");
     }
   };
